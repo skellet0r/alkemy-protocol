@@ -58,4 +58,6 @@ hypothesis:
 
 autofetch_sources: false
 dependencies: null
+  - OpenZeppelin/openzeppelin-contracts@3.4.0
+  - smartcontractkit/chainlink@v0.9.10
 dev_deployment_artifacts: false
