@@ -30,7 +30,9 @@ compiler:
     optimizer:
       enabled: true
       runs: 200
-    remappings: null
+    remappings:
+      - openzeppelin=OpenZeppelin/openzeppelin-contracts@3.4.0
+      - chainlink=smartcontractkit/chainlink@v0.9.10
   vyper:
     version: null
 
