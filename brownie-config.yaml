@@ -32,7 +32,7 @@ compiler:
       runs: 200
     remappings:
       - openzeppelin=OpenZeppelin/openzeppelin-contracts@3.4.0
-      - chainlink=smartcontractkit/chainlink@v0.9.10
+      - chainlink=alphachainio/chainlink-contracts@1.1.2
   vyper:
     version: null
 
@@ -59,7 +59,7 @@ hypothesis:
     shrink: true
 
 autofetch_sources: false
-dependencies: null
+dependencies:
   - OpenZeppelin/openzeppelin-contracts@3.4.0
-  - smartcontractkit/chainlink@v0.9.10
+  - alphachainio/chainlink-contracts@1.1.2
 dev_deployment_artifacts: false
