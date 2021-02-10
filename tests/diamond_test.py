@@ -13,7 +13,7 @@ def test_get_all_facet_addresses_and_function_selectors(
 
     # create sets of response for easier membership testing
     all_result_addresses = set(addresses)
-    all_result_selectors = {selector for array in selectors for selector in array}
+    all_result_selectors = {str(selector) for array in selectors for selector in array}
 
     # create sets of expected response for membership testing
     expected_addresses = {diamond_cut_facet.address, diamond_loupe_facet.address}
@@ -40,8 +40,11 @@ def test_get_all_function_selectors_supported_by_a_facet(
         diamond_loupe_facet.address
     )
 
-    assert set(diamond_cut_facet_selectors) == set(diamond_cut_facet.selectors.keys())
-    assert set(diamond_loupe_facet_selectors) == set(
+    assert {str(sel) for sel in diamond_cut_facet_selectors} == set(
+        diamond_cut_facet.selectors.keys()
+    )
+
+    assert {str(sel) for sel in diamond_loupe_facet_selectors} == set(
         diamond_loupe_facet.selectors.keys()
     )
 
@@ -77,5 +80,5 @@ def test_get_facet_address_for_a_given_selector(
 def test_get_facet_address_for_a_given_selector_fails_for_unsupported_function_selector(
     diamond_loupe,
 ):
-    with brownie.reverts("LibDiamond: Unsupported function selector"):
+    with brownie.reverts("Unsupported function selector"):
         diamond_loupe.facetAddress("0x00000000")
