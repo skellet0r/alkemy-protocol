@@ -1,4 +1,15 @@
 import brownie
+from brownie.network.account import Account
+from brownie.network.contract import ProjectContract, ContractContainer, Contract
+import pytest
+
+
+@pytest.fixture
+def mock_contract_facet(
+    adam: Account, MockContract: ContractContainer
+) -> ProjectContract:
+    """Deploy the Mock Conract"""
+    return adam.deploy(MockContract)
 
 
 def test_get_all_facet_addresses_and_function_selectors(
