@@ -284,4 +284,41 @@ library LibDiamond {
             ds.facets.remove(facetAddress);
         }
     }
+
+    function initDiamondCut(address _init, bytes memory _calldata) internal {
+        // if the _init address is zero address
+        if (_init == address(0)) {
+            // make sure there is no calldata
+            require(
+                _calldata.length == 0,
+                "LibDiamond: _init is address(0) but_calldata is not empty"
+            );
+        } else {
+            // if the _init address is a valid address we must have calldata
+            require(
+                _calldata.length > 0,
+                "LibDiamondCut: _calldata is empty but _init is not address(0)"
+            );
+            // if we aren't calling a diamond function
+            if (_init != address(this)) {
+                // make sure there is contract code at the _init address
+                require(
+                    _init.isContract(),
+                    "LibDiamond: _init address has no code"
+                );
+            }
+            // delegatecall to the _init address
+            (bool success, bytes memory error) = _init.delegatecall(_calldata);
+            // if the call was unsuccessful
+            if (!success) {
+                if (error.length > 0) {
+                    // bubble up the error
+                    revert(string(error));
+                } else {
+                    revert("LibDiamond: _init function reverted");
+                }
+            }
+            // we were successful do nothing else
+        }
+    }
 }
