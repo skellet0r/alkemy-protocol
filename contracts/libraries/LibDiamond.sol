@@ -124,14 +124,20 @@ library LibDiamond {
         // get the storage
         DiamondStorage storage ds = getDiamondStorage();
         // facet address can't be zero address
-        require(_facetAddress != address(0), "LibDiamond: Facet address can't be address(0)");
+        require(
+            _facetAddress != address(0),
+            "LibDiamond: Facet address can't be address(0)"
+        );
         // verify the contract has code to execute
         require(
             _facetAddress.isContract(),
             "LibDiamond: Facet address has no contract code"
         );
         // we can't add selectors for a facet that already exists
-        require(!ds.facets.contains(_facetAddress), "LibDiamond: Facet address already present");
+        require(
+            !ds.facets.contains(_facetAddress),
+            "LibDiamond: Facet address already present"
+        );
         // loop through each selector
         for (
             uint256 selectorIndex;
@@ -155,5 +161,76 @@ library LibDiamond {
         }
         // add the facet address successfully to the set of facets
         ds.facets.add(_facetAddress);
+    }
+
+    /// @dev Replace a function selector in a diamond
+    function replaceFunctions(
+        address _facetAddress,
+        bytes4[] memory _functionSelectors
+    ) internal {
+        // need functions to add
+        require(
+            _functionSelectors.length > 0,
+            "LibDiamond: No selectors to add"
+        );
+        // get the storage
+        DiamondStorage storage ds = getDiamondStorage();
+        // facet address can't be zero address
+        require(
+            _facetAddress != address(0),
+            "LibDiamond: Replacement facet can't be address(0)"
+        );
+
+        require(
+            _facetAddress.isContract(),
+            "LibDiamond: Replacement facet has no contract code"
+        );
+        // loop through each selector
+        for (
+            uint256 selectorIndex;
+            selectorIndex < _functionSelectors.length;
+            selectorIndex++
+        ) {
+            // get the current selector
+            bytes4 selector = _functionSelectors[selectorIndex];
+            address oldFacetAddress = ds.selectorToFacetAddress[selector];
+            // can't replace immutable functions -- functions defined directly in the diamond
+            require(
+                oldFacetAddress != address(this),
+                "LibDiamond: Can't replace an immutable function"
+            );
+            require(
+                oldFacetAddress != _facetAddress,
+                "LibDiamond: Can't replace function with same function"
+            );
+            require(
+                oldFacetAddress != address(0),
+                "LibDiamond: Can't replace function that doesn't exist"
+            );
+            // replace old facet address
+            ds.selectorToFacetAddress[selector] = _facetAddress;
+            bool removeOld =
+                ds.facetAddressToFunctionSelectors[oldFacetAddress].remove(
+                    bytes32(selector)
+                );
+            // The removal has to return true
+            require(
+                removeOld,
+                "LibDiamond: Failed to remove selector from old facet address"
+            );
+            bool addNew =
+                ds.facetAddressToFunctionSelectors[_facetAddress].add(
+                    bytes32(selector)
+                );
+            // The addition has to return true
+            require(
+                addNew,
+                "LibDiamond: Failed to add selector to new facet address"
+            );
+        }
+        // if the oldFacetAddress has no more selectors remove it
+        if (ds.facetAddressToFunctionSelectors[oldFacetAddress].length() == 0) {
+            ds.facets.remove(oldFacetAddress);
+        }
     }
 }
