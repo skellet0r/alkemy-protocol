@@ -95,7 +95,7 @@ def diamond_cut(diamond: ProjectContract, DiamondCut: ContractContainer) -> Cont
     do not match.
     https://eth-brownie.readthedocs.io/en/stable/api-network.html#ContractContainer.at
     """
-    return DiamondCut.at(diamond.address)
+    return Contract.from_abi("Diamond Cut", diamond.address, DiamondCut.abi)
 
 
 @pytest.fixture(scope="module")
@@ -108,4 +108,4 @@ def diamond_loupe(
     do not match.
     https://eth-brownie.readthedocs.io/en/stable/api-network.html#ContractContainer.at
     """
-    return DiamondLoupe.at(diamond.address)
+    return Contract.from_abi("Diamond Loupe", diamond.address, DiamondLoupe.abi)
