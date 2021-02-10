@@ -6,6 +6,7 @@ import {EnumerableSet} from "openzeppelin/contracts/utils/EnumerableSet.sol";
 
 /// @dev Custom collection of functions related to EnumerableSet types
 library LibEnumerableSet {
+    using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     /**
@@ -30,6 +31,19 @@ library LibEnumerableSet {
             index++
         ) {
             array[index] = bytes4(_self.at(index));
+        }
+    }
+
+    function toArray(EnumerableSet.AddressSet storage _self) internal view returns (address[] memory array) {
+        // initialize return array to be the same size as our set
+        array = new address[](_self.length());
+        // for loop which assigns each bytes32 element into the return array
+        for (
+            uint256 index;
+            index < _self.length();
+            index++
+        ) {
+            array[index] = address(_self.at(index));
         }
     }
 }
