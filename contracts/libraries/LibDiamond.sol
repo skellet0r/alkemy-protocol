@@ -3,6 +3,7 @@ pragma solidity 0.7.6;
 pragma abicoder v2;
 
 import {IDiamondLoupe} from "../../interfaces/IDiamondLoupe.sol";
+import {LibEnumerableSet} from "./LibEnumerableSet.sol";
 import {EnumerableSet} from "openzeppelin/contracts/utils/EnumerableSet.sol";
 
 
@@ -13,6 +14,7 @@ import {EnumerableSet} from "openzeppelin/contracts/utils/EnumerableSet.sol";
 library LibDiamond {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.Bytes32Set;
+    using LibEnumerableSet for EnumerableSet.Bytes32Set;
     
     bytes32 constant DIAMOND_STORAGE_POSITION =
         keccak256("diamond.standard.diamond.storage");
@@ -38,5 +40,16 @@ library LibDiamond {
         assembly {
             ds.slot := position
         }
+    }
+
+    /// @dev Returns the bytes4 function selectors for a facet
+    function facetAddressToSelectors(address _facet) internal view returns (bytes4[] memory selectors_) {
+        // load the diamond storage
+        DiamondStorage storage ds = getDiamondStorage(); 
+        // require the facet is valid
+        require(ds.facets.contains(_facet), "LibDiamond: Invalid facet address");
+        // get the facet selectors
+        EnumerableSet.Bytes32Set storage selectors = ds.facetAddressToFunctionSelectors[_facet];
+        return selectors.toBytes4Array();
     }
 }
