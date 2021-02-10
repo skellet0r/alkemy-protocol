@@ -26,6 +26,7 @@ def barry(accounts: Accounts) -> Account:
 
 @pytest.fixture(scope="module")
 def charlie(accounts: Accounts) -> Account:
+    """Get the third available account."""
     return accounts[2]
 
 
