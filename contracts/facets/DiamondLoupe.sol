@@ -49,7 +49,7 @@ contract DiamondLoupe is IDiamondLoupe {
         override
         returns (bytes4[] memory facetFunctionSelectors_)
     {
-        return LibDiamond.facetAddressToSelectors(_facet);
+        facetFunctionSelectors_ = LibDiamond.facetAddressToSelectors(_facet);
     }
 
     /// @notice Get all the facet addresses used by a diamond
@@ -66,5 +66,23 @@ contract DiamondLoupe is IDiamondLoupe {
         EnumerableSet.AddressSet storage facets = ds.facets;
         // assign the array to the return value
         facetAddresses_ = facets.toArray();
+    }
+
+    /// @notice Gets the facet that supports the given selector
+    /// @dev If facet is not found return address(0)
+    /// @param _functionSelector The function selector
+    /// @return facetAddress_ The facet address
+    function facetAddress(bytes4 _functionSelector)
+        external
+        view
+        override
+        returns (address facetAddress_)
+    {
+        // load the diamond storage
+        LibDiamond.DiamondStorage storage ds = LibDiamond.getDiamondStorage();
+        // selector must exist
+        require(ds.selectorToFacetAddress[_functionSelector] != address(0), "Unsupported function selector");
+        // assign and return
+        facetAddress_ = ds.selectorToFacetAddress[_functionSelector];
     }
 }
