@@ -233,4 +233,55 @@ library LibDiamond {
             ds.facets.remove(oldFacetAddress);
         }
     }
+
+    /// @dev Remove a collection of functions from diamond
+    function removeFunctions(
+        address _facetAddress,
+        bytes4[] memory _functionSelectors
+    ) internal {
+        // need functions to add
+        require(
+            _functionSelectors.length > 0,
+            "LibDiamond: No selectors to add"
+        );
+        // get the storage
+        DiamondStorage storage ds = diamondStorage();
+        // facet address can't be zero address
+        require(
+            _facetAddress == address(0),
+            "LibDiamond: Remove facet address must be address(0)"
+        );
+        // loop through each selector we are removing
+        for (
+            uint256 selectorIndex;
+            selectorIndex < _functionSelectors.length;
+            selectorIndex++
+        ) {
+            // get the current selector
+            bytes4 selector = _functionSelectors[selectorIndex];
+            // get the selector's facet address
+            address facetAddress = ds.selectorToFacetAddress[selector];
+            require(
+                facetAddress != address(0),
+                "LibDiamond: Can't remove function that doesn't exist"
+            );
+            // can't remove immutable functions -- functions defined directly in the diamond
+            require(
+                facetAddress != address(this),
+                "LibDiamond: Can't remove immutable function"
+            );
+            // delete the selector
+            bool removeSelector =
+                ds.facetAddressToFunctionSelectors[facetAddress].remove(
+                    bytes32(selector)
+                );
+            require(removeSelector, "LibDiamond: Failed to remove selector");
+            // remove the selector to facet address
+            delete ds.selectorToFacetAddress[selector];
+        }
+        // if there are no more selectors for a facet, remove the facet
+        if (ds.facetAddressToFunctionSelectors[facetAddress].length() == 0) {
+            ds.facets.remove(facetAddress);
+        }
+    }
 }
