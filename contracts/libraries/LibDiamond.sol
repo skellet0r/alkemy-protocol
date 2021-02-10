@@ -227,10 +227,13 @@ library LibDiamond {
                 addNew,
                 "LibDiamond: Failed to add selector to new facet address"
             );
-        }
-        // if the oldFacetAddress has no more selectors remove it
-        if (ds.facetAddressToFunctionSelectors[oldFacetAddress].length() == 0) {
-            ds.facets.remove(oldFacetAddress);
+            // if the oldFacetAddress has no more selectors remove it
+            if (
+                ds.facetAddressToFunctionSelectors[oldFacetAddress].length() ==
+                0
+            ) {
+                ds.facets.remove(oldFacetAddress);
+            }
         }
     }
 
@@ -245,7 +248,7 @@ library LibDiamond {
             "LibDiamond: No selectors to add"
         );
         // get the storage
-        DiamondStorage storage ds = diamondStorage();
+        DiamondStorage storage ds = getDiamondStorage();
         // facet address can't be zero address
         require(
             _facetAddress == address(0),
@@ -278,10 +281,12 @@ library LibDiamond {
             require(removeSelector, "LibDiamond: Failed to remove selector");
             // remove the selector to facet address
             delete ds.selectorToFacetAddress[selector];
-        }
-        // if there are no more selectors for a facet, remove the facet
-        if (ds.facetAddressToFunctionSelectors[facetAddress].length() == 0) {
-            ds.facets.remove(facetAddress);
+            // if there are no more selectors for a facet, remove the facet
+            if (
+                ds.facetAddressToFunctionSelectors[facetAddress].length() == 0
+            ) {
+                ds.facets.remove(facetAddress);
+            }
         }
     }
 

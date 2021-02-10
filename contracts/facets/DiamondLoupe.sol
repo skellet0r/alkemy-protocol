@@ -63,9 +63,9 @@ contract DiamondLoupe is IDiamondLoupe {
         // load the diamond storage
         LibDiamond.DiamondStorage storage ds = LibDiamond.getDiamondStorage();
         // get the facets
-        EnumerableSet.AddressSet storage facets = ds.facets;
+        EnumerableSet.AddressSet storage _facets = ds.facets;
         // assign the array to the return value
-        facetAddresses_ = facets.toArray();
+        facetAddresses_ = _facets.toArray();
     }
 
     /// @notice Gets the facet that supports the given selector
