@@ -6,13 +6,14 @@ import {IDiamondLoupe} from "../../interfaces/IDiamondLoupe.sol";
 import {IDiamondCut} from "../../interfaces/IDiamondCut.sol";
 import {LibEnumerableSet} from "./LibEnumerableSet.sol";
 import {EnumerableSet} from "openzeppelin/contracts/utils/EnumerableSet.sol";
-
+import {Address} from "openzeppelin/contracts/utils/Address.sol";
 
 /// @title Storage library related to the Diamond Standard implementation
 /// @author Edward Amor
 /// @dev A library with only internal functions gets embedded into a
 /// contract by the compiler
 library LibDiamond {
+    using Address for address;
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.Bytes32Set;
     using LibEnumerableSet for EnumerableSet.Bytes32Set;
@@ -102,11 +103,57 @@ library LibDiamond {
                 );
             } else {
                 // revert because the wrong action was given
-                revert(); // dev: Incorrect FacetCutAction
+                revert("LibDiamond: Incorrect facet cut action");
             }
         }
         emit DiamondCut(_diamondCut, _init, _calldata);
         // initialize the diamond
         initDiamondCut(_init, _calldata);
+    }
+
+    /// @dev Add a collection of functions to diamond
+    function addFunctions(
+        address _facetAddress,
+        bytes4[] memory _functionSelectors
+    ) internal {
+        // need functions to add
+        require(
+            _functionSelectors.length > 0,
+            "LibDiamond: No selectors to add"
+        );
+        // get the storage
+        DiamondStorage storage ds = getDiamondStorage();
+        // facet address can't be zero address
+        require(_facetAddress != address(0), "LibDiamond: Facet address can't be address(0)");
+        // verify the contract has code to execute
+        require(
+            _facetAddress.isContract(),
+            "LibDiamond: Facet address has no contract code"
+        );
+        // we can't add selectors for a facet that already exists
+        require(!ds.facets.contains(_facetAddress), "LibDiamond: Facet address already present");
+        // loop through each selector
+        for (
+            uint256 selectorIndex;
+            selectorIndex < _functionSelectors.length;
+            selectorIndex++
+        ) {
+            // get the current iterations function selector
+            bytes4 selector = _functionSelectors[selectorIndex];
+            // check what the selectors facet address is
+            address oldFacetAddress = ds.selectorToFacetAddress[selector];
+            // verify there is no previous facet contract with this function selector
+            require(
+                oldFacetAddress == address(0),
+                "LibDiamond: Function selector already exists"
+            );
+            // add the facet address and selector position in selector array for the selector
+            ds.selectorToFacetAddress[selector] = _facetAddress;
+            ds.facetAddressToFunctionSelectors[_facetAddress].add(
+                bytes32(selector) // will left pad the bytes4 selector
+            );
+        }
+        // add the facet address successfully to the set of facets
+        ds.facets.add(_facetAddress);
     }
 }
