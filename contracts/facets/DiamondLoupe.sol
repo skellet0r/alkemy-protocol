@@ -35,4 +35,12 @@ contract DiamondLoupe is IDiamondLoupe {
                 });
             }
         }
+    
+    /// @notice Gets all the function selectors supported by a specific facet
+    /// @param _facet The facet address
+    /// @return facetFunctionSelectors_ An array of bytes4 function selectors
+    function facetFunctionSelectors(address _facet) external view override returns (bytes4[] memory facetFunctionSelectors_) {
+        return LibDiamond.facetAddressToSelectors(_facet);
+    }
+
 }
