@@ -4,7 +4,7 @@ from brownie.network.contract import ProjectContract, ContractContainer, Contrac
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def mock_contract_facet(
     adam: Account, MockContract: ContractContainer
 ) -> ProjectContract:
