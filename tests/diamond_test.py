@@ -196,3 +196,37 @@ def test_replace_functions_replaces_all_selectors_and_removes_facet(
     diamond_loupe, diamond_cut, MockContract
 ):
     pass
+
+
+def test_replace_reverts_with_facet_address_zero(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_replace_reverts_with_no_selectors(diamond_loupe, diamond_cut, MockContract):
+    pass
+
+
+def test_replace_reverts_when_given_an_unsupported_selector(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_replace_reverts_when_init_is_not_contract(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_replace_reverts_when_init_is_zero_address_and_given_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_replace_reverts_when_init_is_contract_and_not_given_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
