@@ -12,6 +12,17 @@ def mock_contract_facet(
     return adam.deploy(MockContract)
 
 
+@pytest.fixture(scope="module")
+def diamond_mock(diamond: ProjectContract, MockContract: ContractContainer) -> Contract:
+    """Diamond contract with Mock Contract Facet functions available.
+
+    Note: Debugging is not available since the bytecodes of diamond and Mock Contract
+    do not match.
+    https://eth-brownie.readthedocs.io/en/stable/api-network.html#ContractContainer.at
+    """
+    return Contract.from_abi("Diamond Mock", diamond.address, MockContract.abi)
+
+
 def test_get_all_facet_addresses_and_function_selectors(
     diamond_loupe, diamond_cut_facet, diamond_loupe_facet
 ):
