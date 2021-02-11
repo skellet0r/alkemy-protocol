@@ -130,3 +130,39 @@ def test_add_functions_doesnt_call_initialization(
     diamond_loupe, diamond_cut, MockContract
 ):
     pass
+
+
+def test_add_functions_reverts_with_facet_address_zero(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_reverts_with_no_selectors(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_reverts_when_given_a_supported_selector(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_reverts_when_init_is_zero_address_and_given_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_reverts_when_init_is_not_contract(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_reverts_when_init_is_contract_and_not_given_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
