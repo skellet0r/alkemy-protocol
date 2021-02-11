@@ -11,7 +11,7 @@ contract MockContract {
         }
     }
 
-    function setter(uint256 val_) internal {
+    function setter(uint256 val_) external {
         bytes32 position = keccak256("diamond.standard.mock.contract.storage");
         assembly {
             sstore(position, val_)
