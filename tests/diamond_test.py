@@ -106,12 +106,46 @@ def test_get_facet_address_for_a_given_selector_fails_for_unsupported_function_s
         diamond_loupe.facetAddress("0x00000000")
 
 
-def test_add_functions_updates_facets(diamond_loupe, diamond_cut, MockContract):
-    pass
+@pytest.fixture
+def add_facet_cut_data(mock_contract_facet, facet_cut_action):
+    facetcut = [
+        (
+            mock_contract_facet.address,
+            facet_cut_action.ADD,
+            list(mock_contract_facet.selectors.keys()),
+        )
+    ]
+    return facetcut
 
 
-def test_add_functions_updates_selectors(diamond_loupe, diamond_cut, MockContract):
-    pass
+def test_add_functions_updates_facets(
+    adam,
+    diamond_loupe,
+    diamond_cut,
+    zero_address,
+    add_facet_cut_data,
+    mock_contract_facet,
+):
+    diamond_cut.diamondCut(add_facet_cut_data, zero_address, b"", {"from": adam})
+    facet_addresses = diamond_loupe.facetAddresses()
+
+    assert mock_contract_facet.address in facet_addresses
+
+
+def test_add_functions_updates_selectors(
+    adam,
+    diamond_loupe,
+    diamond_cut,
+    zero_address,
+    add_facet_cut_data,
+    mock_contract_facet,
+):
+    diamond_cut.diamondCut(add_facet_cut_data, zero_address, b"", {"from": adam})
+    facet_selectors = diamond_loupe.facetFunctionSelectors(mock_contract_facet.address)
+
+    assert set(mock_contract_facet.selectors.keys()) == {
+        str(sel) for sel in facet_selectors
+    }
 
 
 def test_add_functions_emits_diamond_cut_event(
@@ -232,9 +266,7 @@ def test_replace_reverts_when_init_is_contract_and_not_given_calldata(
     pass
 
 
-def test_remove_emits_diamond_cut_event(
-    diamond_loupe, diamond_cut, MockContract
-):
+def test_remove_emits_diamond_cut_event(diamond_loupe, diamond_cut, MockContract):
     pass
 
 
@@ -244,15 +276,11 @@ def test_remove_calls_initialization_with_calldata(
     pass
 
 
-def test_remove_doesnt_call_initialization(
-    diamond_loupe, diamond_cut, MockContract
-):
+def test_remove_doesnt_call_initialization(diamond_loupe, diamond_cut, MockContract):
     pass
 
 
-def test_remove_single_selector(
-    diamond_loupe, diamond_cut, MockContract
-):
+def test_remove_single_selector(diamond_loupe, diamond_cut, MockContract):
     pass
 
 
