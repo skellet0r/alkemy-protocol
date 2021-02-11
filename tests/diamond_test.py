@@ -230,3 +230,67 @@ def test_replace_reverts_when_init_is_contract_and_not_given_calldata(
     diamond_loupe, diamond_cut, MockContract
 ):
     pass
+
+
+def test_remove_emits_diamond_cut_event(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_calls_initialization_with_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_doesnt_call_initialization(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_single_selector(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_all_selectors_for_a_facet_and_removes_facet(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_reverts_with_facet_address_not_zero_address(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_reverts_with_no_selectors(diamond_loupe, diamond_cut, MockContract):
+    pass
+
+
+def test_remove_reverts_when_given_an_unsupported_selector(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_reverts_when_init_is_not_contract(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_reverts_when_init_is_zero_address_and_given_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_remove_reverts_when_init_is_contract_and_not_given_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
