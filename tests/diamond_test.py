@@ -23,6 +23,18 @@ def diamond_mock(diamond: ProjectContract, MockContract: ContractContainer) -> C
     return Contract.from_abi("Diamond Mock", diamond.address, MockContract.abi)
 
 
+@pytest.fixture
+def add_facet_cut_data(mock_contract_facet, facet_cut_action):
+    facetcut = [
+        (
+            mock_contract_facet.address,
+            facet_cut_action.ADD,
+            list(mock_contract_facet.selectors.keys()),
+        )
+    ]
+    return facetcut
+
+
 def test_get_all_facet_addresses_and_function_selectors(
     diamond_loupe, diamond_cut_facet, diamond_loupe_facet
 ):
@@ -104,18 +116,6 @@ def test_get_facet_address_for_a_given_selector_fails_for_unsupported_function_s
 ):
     with brownie.reverts("Unsupported function selector"):
         diamond_loupe.facetAddress("0x00000000")
-
-
-@pytest.fixture
-def add_facet_cut_data(mock_contract_facet, facet_cut_action):
-    facetcut = [
-        (
-            mock_contract_facet.address,
-            facet_cut_action.ADD,
-            list(mock_contract_facet.selectors.keys()),
-        )
-    ]
-    return facetcut
 
 
 def test_add_functions_updates_facets(
