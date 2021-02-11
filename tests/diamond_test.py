@@ -104,3 +104,29 @@ def test_get_facet_address_for_a_given_selector_fails_for_unsupported_function_s
 ):
     with brownie.reverts("Unsupported function selector"):
         diamond_loupe.facetAddress("0x00000000")
+
+
+def test_add_functions_updates_facets(diamond_loupe, diamond_cut, MockContract):
+    pass
+
+
+def test_add_functions_updates_selectors(diamond_loupe, diamond_cut, MockContract):
+    pass
+
+
+def test_add_functions_emits_diamond_cut_event(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_calls_initialization_with_calldata(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
+
+
+def test_add_functions_doesnt_call_initialization(
+    diamond_loupe, diamond_cut, MockContract
+):
+    pass
