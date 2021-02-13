@@ -47,6 +47,18 @@ def replace_facet_cut_data(mock_contract_facet, facet_cut_action, diamond_cut_fa
     return facetcut
 
 
+@pytest.fixture
+def remove_facet_cut_data(facet_cut_action, diamond_cut_facet, zero_address):
+    facetcut = [
+        (
+            zero_address,
+            facet_cut_action.REMOVE,
+            list(diamond_cut_facet.selectors.keys()),
+        )
+    ]
+    return facetcut
+
+
 def test_get_all_facet_addresses_and_function_selectors(
     diamond_loupe, diamond_cut_facet, diamond_loupe_facet
 ):
