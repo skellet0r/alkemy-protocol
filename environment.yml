@@ -10,3 +10,4 @@ dependencies:
   - pip
   - pip:
     - eth-brownie==1.13.1
+    - git+https://github.com/skellet0r/eth-event@fix/issue-15#egg=eth_event
