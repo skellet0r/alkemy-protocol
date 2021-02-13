@@ -203,13 +203,21 @@ def test_add_functions_reverts_with_facet_address_zero(
         diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
 
 
-def test_add_functions_reverts_with_no_selectors(
-    diamond_loupe, diamond_cut, MockContract
-):
-    pass
-
-
 def test_add_functions_reverts_when_given_a_supported_selector(
+    adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
+):
+    facetcut = [
+        (
+            mock_contract_facet.address,
+            facet_cut_action.ADD,
+            list(diamond_cut.selectors.keys()),
+        )
+    ]
+    with brownie.reverts("LibDiamond: Function selector already exists"):
+        diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
+
+
+def test_add_functions_reverts_with_no_selectors(
     adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
 ):
     facetcut = [(mock_contract_facet.address, facet_cut_action.ADD, [],)]
