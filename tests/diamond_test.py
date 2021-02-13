@@ -35,6 +35,18 @@ def add_facet_cut_data(mock_contract_facet, facet_cut_action):
     return facetcut
 
 
+@pytest.fixture
+def replace_facet_cut_data(mock_contract_facet, facet_cut_action, diamond_cut_facet):
+    facetcut = [
+        (
+            mock_contract_facet.address,
+            facet_cut_action.REPLACE,
+            list(diamond_cut_facet.selectors.keys()),
+        )
+    ]
+    return facetcut
+
+
 def test_get_all_facet_addresses_and_function_selectors(
     diamond_loupe, diamond_cut_facet, diamond_loupe_facet
 ):
@@ -232,6 +244,39 @@ def test_add_functions_reverts_when_init_is_contract_and_not_given_calldata(
         diamond_cut.diamondCut(
             add_facet_cut_data, mock_contract_facet.address, b"", {"from": adam}
         )
+
+
+def test_replace_functions_updates_facets(
+    adam,
+    diamond_loupe,
+    diamond_cut,
+    zero_address,
+    replace_facet_cut_data,
+    mock_contract_facet,
+    diamond_cut_facet,
+):
+    diamond_cut.diamondCut(replace_facet_cut_data, zero_address, b"", {"from": adam})
+    facet_addresses = diamond_loupe.facetAddresses()
+
+    assert mock_contract_facet.address in facet_addresses
+    assert diamond_cut_facet.address not in facet_addresses
+
+
+def test_replace_functions_updates_selectors(
+    adam,
+    diamond_loupe,
+    diamond_cut,
+    zero_address,
+    replace_facet_cut_data,
+    mock_contract_facet,
+    diamond_cut_facet,
+):
+    diamond_cut.diamondCut(replace_facet_cut_data, zero_address, b"", {"from": adam})
+    facet_selectors = diamond_loupe.facetFunctionSelectors(mock_contract_facet.address)
+
+    assert set(diamond_cut_facet.selectors.keys()) == {
+        str(sel) for sel in facet_selectors
+    }
 
 
 def test_replace_functions_emits_diamond_cut_event(
