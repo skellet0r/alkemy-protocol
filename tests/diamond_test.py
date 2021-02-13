@@ -149,27 +149,46 @@ def test_add_functions_updates_selectors(
 
 
 def test_add_functions_emits_diamond_cut_event(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, zero_address, add_facet_cut_data,
 ):
-    pass
+    tx = diamond_cut.diamondCut(add_facet_cut_data, zero_address, b"", {"from": adam})
+
+    assert "DiamondCut" in tx.events
+    assert len(tx.events) == 1
 
 
 def test_add_functions_calls_initialization_with_calldata(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, add_facet_cut_data, mock_contract_facet, diamond_mock,
 ):
-    pass
+    calldata = diamond_mock.setter.encode_input(100)
+
+    diamond_cut.diamondCut(
+        add_facet_cut_data, mock_contract_facet.address, calldata, {"from": adam}
+    )
+
+    assert diamond_mock.getter() == 100
 
 
 def test_add_functions_doesnt_call_initialization(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, add_facet_cut_data, zero_address, diamond_mock,
 ):
-    pass
+    diamond_cut.diamondCut(add_facet_cut_data, zero_address, b"", {"from": adam})
+
+    assert diamond_mock.getter() == 0
 
 
 def test_add_functions_reverts_with_facet_address_zero(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
 ):
-    pass
+    facetcut = [
+        (
+            zero_address,
+            facet_cut_action.ADD,
+            list(mock_contract_facet.selectors.keys()),
+        )
+    ]
+    with brownie.reverts("LibDiamond: Facet address can't be address(0)"):
+        diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
 
 
 def test_add_functions_reverts_with_no_selectors(
@@ -179,27 +198,40 @@ def test_add_functions_reverts_with_no_selectors(
 
 
 def test_add_functions_reverts_when_given_a_supported_selector(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
 ):
-    pass
+    facetcut = [(mock_contract_facet.address, facet_cut_action.ADD, [],)]
+    with brownie.reverts("LibDiamond: No selectors to add"):
+        diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
 
 
 def test_add_functions_reverts_when_init_is_zero_address_and_given_calldata(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, add_facet_cut_data, zero_address, diamond_mock,
 ):
-    pass
+    calldata = diamond_mock.setter.encode_input(100)
+    with brownie.reverts("LibDiamond: _init is address(0) but_calldata is not empty"):
+        diamond_cut.diamondCut(
+            add_facet_cut_data, zero_address, calldata, {"from": adam}
+        )
 
 
 def test_add_functions_reverts_when_init_is_not_contract(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, add_facet_cut_data, diamond_mock,
 ):
-    pass
+    calldata = diamond_mock.setter.encode_input(100)
+    with brownie.reverts("LibDiamond: _init address has no code"):
+        diamond_cut.diamondCut(add_facet_cut_data, adam, calldata, {"from": adam})
 
 
 def test_add_functions_reverts_when_init_is_contract_and_not_given_calldata(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, add_facet_cut_data, mock_contract_facet, diamond_mock,
 ):
-    pass
+    with brownie.reverts(
+        "LibDiamondCut: _calldata is empty but _init is not address(0)"
+    ):
+        diamond_cut.diamondCut(
+            add_facet_cut_data, mock_contract_facet.address, b"", {"from": adam}
+        )
 
 
 def test_replace_functions_emits_diamond_cut_event(
