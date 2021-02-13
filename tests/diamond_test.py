@@ -288,67 +288,162 @@ def test_replace_functions_updates_selectors(
 
 
 def test_replace_functions_emits_diamond_cut_event(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, zero_address, replace_facet_cut_data
 ):
-    pass
+    tx = diamond_cut.diamondCut(
+        replace_facet_cut_data, zero_address, b"", {"from": adam}
+    )
+    diamondcut_topic = diamond_cut.topics["DiamondCut"]
+
+    # note this needs to be fixed
+    # should only need to do "DiamondCut" in tx.events
+    # brownie isn't properly decoding the tx event topics
+    # on this second go around
+    assert tx.events[0]["topic1"] == diamondcut_topic or "DiamondCut" in tx.events
 
 
 def test_replace_functions_calls_initialization_with_calldata(
-    diamond_loupe, diamond_cut, MockContract
+    adam,
+    diamond_cut,
+    add_facet_cut_data,
+    zero_address,
+    replace_facet_cut_data,
+    mock_contract_facet,
+    diamond_mock,
 ):
-    pass
+    calldata = diamond_mock.setter.encode_input(100)
+
+    diamond_cut.diamondCut(
+        add_facet_cut_data, zero_address, b"", {"from": adam},
+    )
+
+    before = diamond_mock.getter()
+
+    diamond_cut.diamondCut(
+        replace_facet_cut_data, mock_contract_facet.address, calldata, {"from": adam},
+    )
+
+    assert before == 0
+    assert diamond_mock.getter() == 100
 
 
 def test_replace_functions_doesnt_call_initialization(
-    diamond_loupe, diamond_cut, MockContract
+    adam,
+    diamond_cut,
+    add_facet_cut_data,
+    zero_address,
+    replace_facet_cut_data,
+    mock_contract_facet,
+    diamond_mock,
 ):
-    pass
+    diamond_cut.diamondCut(
+        add_facet_cut_data, zero_address, b"", {"from": adam},
+    )
+
+    before = diamond_mock.getter()
+
+    diamond_cut.diamondCut(
+        replace_facet_cut_data, zero_address, b"", {"from": adam},
+    )
+
+    assert before == 0
+    assert diamond_mock.getter() == 0
 
 
 def test_replace_functions_replaces_single_selector(
-    diamond_loupe, diamond_cut, MockContract
+    adam,
+    diamond_loupe,
+    diamond_cut,
+    zero_address,
+    replace_facet_cut_data,
+    mock_contract_facet,
 ):
-    pass
+    selector = diamond_cut.signatures["diamondCut"]
+
+    diamond_cut.diamondCut(
+        replace_facet_cut_data, zero_address, b"", {"from": adam},
+    )
+
+    assert diamond_loupe.facetAddress(selector) == mock_contract_facet.address
 
 
 def test_replace_functions_replaces_all_selectors_and_removes_facet(
-    diamond_loupe, diamond_cut, MockContract
+    adam,
+    diamond_loupe,
+    diamond_cut,
+    diamond_cut_facet,
+    zero_address,
+    replace_facet_cut_data,
+    mock_contract_facet,
 ):
-    pass
+
+    diamond_cut.diamondCut(
+        replace_facet_cut_data, zero_address, b"", {"from": adam},
+    )
+
+    assert mock_contract_facet.address in diamond_loupe.facetAddresses()
+    assert diamond_cut_facet.address not in diamond_loupe.facetAddresses()
 
 
 def test_replace_reverts_with_facet_address_zero(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
 ):
-    pass
+    facetcut = [
+        (
+            zero_address,
+            facet_cut_action.REPLACE,
+            list(mock_contract_facet.selectors.keys()),
+        )
+    ]
+    with brownie.reverts("LibDiamond: Replacement facet can't be address(0)"):
+        diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
 
 
-def test_replace_reverts_with_no_selectors(diamond_loupe, diamond_cut, MockContract):
-    pass
+def test_replace_reverts_with_no_selectors(
+    adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
+):
+    facetcut = [(mock_contract_facet.address, facet_cut_action.REPLACE, [],)]
+    with brownie.reverts("LibDiamond: No selectors to replace"):
+        diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
 
 
 def test_replace_reverts_when_given_an_unsupported_selector(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, zero_address, mock_contract_facet, facet_cut_action
 ):
-    pass
+    facetcut = [
+        (mock_contract_facet.address, facet_cut_action.REPLACE, ["0x00c0ffee"],)
+    ]
+    with brownie.reverts("LibDiamond: Can't replace function that doesn't exist"):
+        diamond_cut.diamondCut(facetcut, zero_address, b"", {"from": adam})
 
 
 def test_replace_reverts_when_init_is_not_contract(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, replace_facet_cut_data, diamond_mock,
 ):
-    pass
+    calldata = diamond_mock.setter.encode_input(100)
+    with brownie.reverts("LibDiamond: _init address has no code"):
+        diamond_cut.diamondCut(replace_facet_cut_data, adam, calldata, {"from": adam})
 
 
 def test_replace_reverts_when_init_is_zero_address_and_given_calldata(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, replace_facet_cut_data, zero_address, diamond_mock,
 ):
-    pass
+    calldata = diamond_mock.setter.encode_input(100)
+    with brownie.reverts("LibDiamond: _init is address(0) but_calldata is not empty"):
+        diamond_cut.diamondCut(
+            replace_facet_cut_data, zero_address, calldata, {"from": adam}
+        )
 
 
 def test_replace_reverts_when_init_is_contract_and_not_given_calldata(
-    diamond_loupe, diamond_cut, MockContract
+    adam, diamond_cut, replace_facet_cut_data, mock_contract_facet, diamond_mock,
 ):
-    pass
+    with brownie.reverts(
+        "LibDiamondCut: _calldata is empty but _init is not address(0)"
+    ):
+        diamond_cut.diamondCut(
+            replace_facet_cut_data, mock_contract_facet.address, b"", {"from": adam}
+        )
 
 
 def test_remove_emits_diamond_cut_event(diamond_loupe, diamond_cut, MockContract):

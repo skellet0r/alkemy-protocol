@@ -171,7 +171,7 @@ library LibDiamond {
         // need functions to add
         require(
             _functionSelectors.length > 0,
-            "LibDiamond: No selectors to add"
+            "LibDiamond: No selectors to replace"
         );
         // get the storage
         DiamondStorage storage ds = getDiamondStorage();
