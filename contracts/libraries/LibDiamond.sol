@@ -235,6 +235,8 @@ library LibDiamond {
                 ds.facets.remove(oldFacetAddress);
             }
         }
+        // add the new facet address to the set of facets
+        ds.facets.add(_facetAddress);
     }
 
     /// @dev Remove a collection of functions from diamond
